@@ -1,0 +1,28 @@
+{
+  "publish_dir" : "{{publishDir}}",
+  "mapping_dir" : "{{mappingDir}}",
+  "lint": {
+    "js": {
+      "engine": "eslint",
+      "config": "eslint.json"
+    },
+    "css": {
+      "engine": "csslint",
+      "config": "csslint.json"
+    }
+  },
+  "test": {},
+  "compress": {
+      "png": true
+  },
+  "modular": {
+    "type": "amd",
+    "idprefix": "",
+    "ignore": "+(lib|src|test)/**"
+  },
+  "preprocessors": {
+      "coffee": ["coffee", "modular"],
+      "less": ["less"],
+      "js": ["modular"]
+  }
+}

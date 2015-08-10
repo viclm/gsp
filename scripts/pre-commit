@@ -1,0 +1,21 @@
+#! /usr/bin/env node
+
+var path = require('path');
+var child_process = require('child_process');
+
+process.cwd(path.join(__dirname, '../../'));
+
+var tasks = ['lint'];
+
+process.env.FORCE_COLOR = true;
+
+tasks.forEach(function (task) {
+    console.log(task + 'ing...');
+    var stdout = child_process.execSync('gsp ' + task).toString();
+    console.log(stdout);
+    if (stdout.indexOf('problems') > -1 && stdout.indexOf('OKAY') === -1) {
+        process.exit(1);
+    }
+});
+
+console.log('Commiting...');
