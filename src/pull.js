@@ -7,6 +7,9 @@ const path = require('path');
 const prompt = require('prompt');
 const url = require('url');
 
+let warns = [];
+let errors = [];
+
 let findFileSync = function (filename, start, stop) {
     let filepath = path.join(start, filename), last = null;
     while (start !== stop && start !== last) {
@@ -22,9 +25,14 @@ let findFileSync = function (filename, start, stop) {
 let clone = function (repos, options, callback) {
     let rUsername = /^(\/\/)?[^\/@]+@/;
     async.eachLimit(repos, 5, function (repo, callback) {
+        console.log(`Cloning ${repo.url}`);
         child_process.exec(`git clone ${repo.url.replace(rUsername, '$1' + options.user + '@')} ${repo.pathname}`, function (err, stdout, stderr) {
-            console.log(`\nClone ${repo.url}`);
-            console.log((err && err.message || stdout || stderr).trim());
+            if (err) {
+                errors.push({
+                    repo: repo.url,
+                    msg: stderr
+                });
+            }
             callback();
         });
     }, callback);
@@ -36,16 +44,25 @@ let update = function (repos, options, callback) {
         child_process.exec('git branch', {
             cwd: repo
         }, function (err, stdout) {
+            console.log(`Updating ${repo}`);
             if (rMaster.test(stdout)) {
                 child_process.exec('git pull origin master', {
                     cwd: repo
                 }, function (err, stdout, stderr) {
-                    console.log(`\nUpdate ${repo}`);
-                    console.log((err && err.message || stdout || stderr).trim());
+                    if (err) {
+                        errors.push({
+                            repo: repo,
+                            msg: stderr
+                        });
+                    }
                     callback();
                 });
             }
             else {
+                warns.push({
+                    repo: repo,
+                    msg: 'Not in master branch, update skipped.'
+                });
                 callback();
             }
         });
@@ -86,18 +103,31 @@ let pull = function (repos, options) {
             }
         },
         function (callback) {
-            if (cloneRepos.length) {
-                clone(cloneRepos, options, callback);
-            }
-            else {
-                callback();
-            }
+            callback();
+        },
+        function (callback) {
+            clone(cloneRepos, options, callback);
         },
         function (callback) {
             update(updateRepos, options, callback);
         }
     ], function () {
-        console.log(chalk.green('\nAll repositories is up to date.'));
+        if (warns.length) {
+            for (let log of warns) {
+                console.log(`\n${chalk.bold.bgYellow(' WARN ')} ${log.repo}`);
+                console.log(log.msg);
+            }
+        }
+        if (errors.length) {
+            console.log(chalk.bold.red('\nPull finished with errors.'));
+            for (let log of errors) {
+                console.log(`\n${chalk.bold.white.bgRed(' ERROR ')} ${log.repo}`);
+                console.log(log.msg);
+            }
+        }
+        else {
+            console.log(chalk.bold.green('\nAll repositories is up to date.'));
+        }
     });
 };
 
