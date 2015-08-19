@@ -23,10 +23,11 @@ let findFileSync = function (filename, start, stop) {
 };
 
 let clone = function (repos, options, callback) {
-    let rUsername = /^(\/\/)?[^\/@]+@/;
+    let rUsername = /x{5}/;
     async.eachLimit(repos, 5, function (repo, callback) {
+        repo.url = repo.url.replace(rUsername, options.user);
         console.log(`Cloning ${repo.url}`);
-        child_process.exec(`git clone ${repo.url.replace(rUsername, '$1' + options.user + '@')} ${repo.pathname}`, function (err, stdout, stderr) {
+        child_process.exec(`git clone ${repo.url} ${repo.pathname}`, function (err, stdout, stderr) {
             if (err) {
                 errors.push({
                     repo: repo.url,
@@ -85,7 +86,10 @@ let pull = function (repos, options) {
     });
     async.series([
         function (callback) {
-            if (cloneRepos.length && !options.user) {
+            let hasPlaceholder = cloneRepos.some(function (u) {
+                return u.url.indexOf('ssh://xxxxx@') === 0;
+            });
+            if (hasPlaceholder && !options.user) {
                 prompt.message = chalk.green('[?]');
                 prompt.delimiter = ' ';
                 prompt.start();
