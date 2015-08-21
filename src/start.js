@@ -4,7 +4,6 @@ const di = require('di');
 const gspdata = require('./util/gspdata');
 const file = require('./file');
 const fs = require('fs-extra');
-const glob = require('glob');
 const http = require('http');
 const mine = require('mime');
 const path = require('path');
@@ -23,17 +22,21 @@ let start = function (options, watch, file) {
 
     options.port = options.port || 7070;
 
-    glob.sync('**/.gspconfig', { cwd: options.cwd }).forEach(function (repo) {
-        let data = fs.readJSONSync(path.join(options.cwd, repo), {throws: false}) || {};
-        let repoId = path.dirname(repo);
-        $repoLocation[repoId] = path.join(options.cwd, repoId);
-        if (data.mapping_dir) {
-            $repoMapping[data.mapping_dir] = repoId;
+    for (let repo of fs.readdirSync(options.cwd)) {
+        let gspconfig = path.join(options.cwd, repo, '.gspconfig');
+        if (!fs.existsSync(gspconfig)) {
+            continue;
         }
-        let hookdir = path.join(options.cwd, repoId, '.git/hooks/pre-commit');
-        fs.writeFileSync(hookdir, fs.readFileSync(path.join(__dirname, '../scripts/pre-commit')));
+        gspconfig = fs.readJSONSync(gspconfig, {throws: false}) || {};
+        $repoLocation[repo] = path.join(options.cwd, repo);
+        if (gspconfig.mapping_dir) {
+            $repoMapping[gspconfig.mapping_dir] = repo;
+        }
+        let hookdir = path.join(options.cwd, repo, '.git/hooks/pre-commit');
+        fs.outputFileSync(hookdir, fs.readFileSync(path.join(__dirname, '../scripts/pre-commit')));
         fs.chmodSync(hookdir, '751');
-    });
+    }
+
     gspdata.set('repositories', $repoLocation);
 
     let server = http.createServer();

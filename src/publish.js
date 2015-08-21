@@ -19,16 +19,7 @@ let findFileSync = function (filename, start, stop) {
 exports.publish = function (options) {
     let repoLocation = findFileSync('.gspconfig', process.cwd());
     if (repoLocation) {
-        let gsproxyWorkspace = findFileSync('.gsp_workspace', repoLocation);
-        if (gsproxyWorkspace) {
-            options.repo = path.dirname(repoLocation).slice(path.dirname(gsproxyWorkspace).length + 1);
-        }
-        else {
-            process.stdout.write(chalk.bold('Usage Exception: '));
-            console.log('Unable to find a valid gsp workspace.\n');
-            console.log('You can fix it by re run `gsp pull`.');
-            process.exit();
-        }
+        options.repo = path.basename(path.dirname(repoLocation));
     }
     else {
         process.stdout.write(chalk.bold('Usage Exception: '));
@@ -38,8 +29,7 @@ exports.publish = function (options) {
         process.exit();
     }
 
-    http
-    .get({
+    http.get({
         host: process.env.GSP_HOST || 'gsp.com',
         path: '/gsp/publish?' + JSON.stringify(options)
     }, function (response) {
@@ -67,8 +57,5 @@ exports.publish = function (options) {
                 console.log(data);
             }
         });
-    })
-    .on('error', function () {
-        console.log(chalk.red('Make sure hosts are configed correctly.'));
     });
 };

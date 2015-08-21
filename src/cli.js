@@ -41,7 +41,6 @@ program
 .option('--author <username>', 'specify a author to interacting with subversion repository instead of the default author of commit')
 .option('--preview', 'preview the range of changesets for publish')
 .option('--skip <commit>', 'set the start point of publish after the skip one')
-.option('--stack', 'show the error stack of server')
 .action(run);
 
 program

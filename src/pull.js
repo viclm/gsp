@@ -5,7 +5,6 @@ const fs = require('fs-extra');
 const http = require('http');
 const path = require('path');
 const prompt = require('prompt');
-const url = require('url');
 
 let warns = [];
 let errors = [];
@@ -25,12 +24,12 @@ let findFileSync = function (filename, start, stop) {
 let clone = function (repos, options, callback) {
     let rUsername = /x{5}/;
     async.eachLimit(repos, 5, function (repo, callback) {
-        repo.url = repo.url.replace(rUsername, options.user);
-        console.log(`Cloning ${repo.url}`);
-        child_process.exec(`git clone ${repo.url} ${repo.pathname}`, function (err, stdout, stderr) {
+        repo = repo.replace(rUsername, options.user);
+        console.log(`Cloning ${repo}`);
+        child_process.exec(`git clone ${repo}`, function (err, stdout, stderr) {
             if (err) {
                 errors.push({
-                    repo: repo.url,
+                    repo: repo,
                     msg: stderr
                 });
             }
@@ -72,22 +71,22 @@ let update = function (repos, options, callback) {
 
 let pull = function (repos, options) {
     let cloneRepos = [], updateRepos = [];
-    repos.forEach(function (remoteUrl) {
-        let repo = url.parse(remoteUrl).pathname.slice(1, -4);
-        if (fs.existsSync(repo)) {
-            updateRepos.push(repo);
-        }
-        else {
-            cloneRepos.push({
-                pathname: repo,
-                url: remoteUrl
-            });
-        }
-    });
     async.series([
         function (callback) {
+            repos.forEach(function (remoteUrl) {
+                let repo = path.basename(remoteUrl, '.git');
+                if (fs.existsSync(repo)) {
+                    updateRepos.push(repo);
+                }
+                else {
+                    cloneRepos.push(remoteUrl);
+                }
+            });
+            callback();
+        },
+        function (callback) {
             let hasPlaceholder = cloneRepos.some(function (u) {
-                return u.url.indexOf('ssh://xxxxx@') === 0;
+                return u.indexOf('ssh://xxxxx@') === 0;
             });
             if (hasPlaceholder && !options.user) {
                 prompt.message = chalk.green('[?]');
@@ -105,9 +104,6 @@ let pull = function (repos, options) {
             else {
                 callback();
             }
-        },
-        function (callback) {
-            callback();
         },
         function (callback) {
             clone(cloneRepos, options, callback);
@@ -169,9 +165,14 @@ exports.pull = function (options) {
             data += chunk;
         });
         response.on('end', function () {
-            pull(JSON.parse(data), options);
+            try {
+                data = JSON.parse(data);
+            }
+            catch (e) {
+                console.log(chalk.red('The response is not a valid JSON string of repositories.'));
+                process.exit();
+            }
+            pull(data, options);
         });
-    }).on('error', function () {
-        console.log(chalk.red('Make sure hosts are configed correctly.'));
     });
 };

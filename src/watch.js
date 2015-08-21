@@ -140,16 +140,17 @@ let watch = function (options, gspdata, lint, livereload) {
     console.log('Waiting for changes');
     watcher.on('change', function (filepath) {
 
-        let gspconfigFile = findFileSync('.gspconfig', filepath, options.cwd);
+        let gspconfig = findFileSync('.gspconfig', filepath, options.cwd);
 
-        if (!gspconfigFile) {
+        if (!gspconfig) {
             return;
         }
 
-        let repoId = path.relative(options.cwd, path.dirname(gspconfigFile));
+        let repoId = path.basename(path.dirname(gspconfig));
         let repoLocation = gspdata.get('repositories', repoId);
         let pathname = path.relative(repoLocation, filepath);
-        let gspconfig = fs.readJSONSync(gspconfigFile, {throws: false}) || {};
+
+        gspconfig = fs.readJSONSync(gspconfig, {throws: false}) || {};
 
         console.log('\n%s changed', path.join(repoId, pathname));
 
