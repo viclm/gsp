@@ -6,7 +6,7 @@ const isBinaryPath = require('is-binary-path');
 const path = require('path');
 
 const DEFAULT_PREPROCESSOR_CONFIG = {
-    "coffee": ["coffee", "modular"],
+    "coffee": ["coffee"],
     "less": ["less"],
     "js": ["modular"]
 };
@@ -81,7 +81,7 @@ class File {
     preprocess(callback) {
         let preprocessorConfig = this.config.preprocessors || DEFAULT_PREPROCESSOR_CONFIG;
         async.eachSeries(Object.keys(preprocessorConfig), (extname, callback) => {
-            if (path.extname(this.filename).slice(1) === extname) {
+            if (path.extname(this.get('filename')).slice(1) === extname) {
                 async.eachSeries(preprocessorConfig[extname], (preprocessor, callback) => {
                     let mod;
                     try {

@@ -1,17 +1,19 @@
-var chalk = require('chalk');
-var less = require('less');
+const chalk = require('chalk');
+const less = require('less');
 
-var compileLess = function (filedata, callback) {
+let rLess = /\.less$/;
+
+let compileLess = function (filedata, callback) {
     if (/^@import\s/m.test(filedata)) {
         callback(new Error('less import directives are not supported'));
         return;
     }
     less.render(filedata, function (err, data) {
         if (err) {
-            var column = err.column;
-            var line = err.line - 1;
-            var codeLine = filedata.split('\n')[line];
-            var offendingCharacter;
+            let column = err.column;
+            let line = err.line - 1;
+            let codeLine = filedata.split('\n')[line];
+            let offendingCharacter;
 
             if (column < codeLine.length) {
                 offendingCharacter = chalk.red(codeLine[column]);
@@ -36,6 +38,7 @@ var compileLess = function (filedata, callback) {
 module.exports = function (file, callback) {
     compileLess(file.get('filedata'), function (err, filedata) {
         if (!err) {
+            file.set('filename', file.get('filename').replace(rLess, '.css'));
             file.set('filedata', filedata);
         }
         callback(err);

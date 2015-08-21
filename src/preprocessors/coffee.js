@@ -1,7 +1,9 @@
-var coffee = require('coffee-script');
+const coffee = require('coffee-script');
 
-var compileCoffee = function (filedata, callback) {
-    var err = null;
+let rCoffee = /\.coffee$/;
+
+let compileCoffee = function (filedata, callback) {
+    let err = null;
     try {
         filedata = coffee.compile(filedata, {
             bare: true
@@ -19,6 +21,7 @@ var compileCoffee = function (filedata, callback) {
 module.exports = function (file, callback) {
     compileCoffee(file.get('filedata'), function (err, filedata) {
         if (!err) {
+            file.set('filename', file.get('filename').replace(rCoffee, '.js'));
             file.set('filedata', filedata);
         }
         callback(err);
