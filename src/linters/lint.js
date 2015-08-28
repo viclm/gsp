@@ -1,5 +1,5 @@
 const chalk = require('chalk');
-const fs = require('fs');
+const fs = require('fs-extra');
 const glob = require('../util/glob');
 const textable = require('text-table');
 
@@ -24,7 +24,7 @@ class Lint {
         }
         this.filedata = fs.readFileSync(this.filename, {encoding: 'utf8'});
         if (typeof this.config === 'string') {
-            this.config = JSON.parse(fs.readFileSync(this.config));
+            this.config = fs.readJSONSync(this.config, {throws: false}) || {};
         }
         return true;
     }
