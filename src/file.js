@@ -199,7 +199,9 @@ class Concat extends File {
                     file = new File(this.workdir, file, this.config);
                     file.read((err, filedata) => {
                         if (!err) {
-                            filedata = `/* from ${path.join(file.workdir, file.filename)} */\n` + filedata;
+                            filedata = `/* from ${path.join(file.get('workdir'), file.get('filename'))} */\n` + filedata;
+                            let orignalFilename = this.get('filename');
+                            this.set('filename', orignalFilename.slice(0, -path.extname(orignalFilename).length) + path.extname(file.get('filename')));
                         }
                         c(err, filedata);
                     });
