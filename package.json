@@ -1,6 +1,6 @@
 {
   "name": "gsp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A repository synchronizer for frontend development workflow",
   "keywords": [
     "git",
@@ -27,6 +27,8 @@
   },
   "dependencies": {
     "async": "^1.2.1",
+    "babel-core": "^6.1.2",
+    "babel-preset-es2015": "^6.1.2",
     "chalk": "^1.0.0",
     "chokidar": "^1.0.3",
     "commander": "^2.8.1",
@@ -39,8 +41,7 @@
     "mustache": "^2.1.3",
     "prompt": "^0.2.14",
     "text-table": "^0.2.0",
-    "tiny-lr": "^0.1.6",
-    "upa": "^0.1.2"
+    "tiny-lr": "^0.1.6"
   },
   "optionalDependencies": {
     "coffee-script": "^1.9.3",

@@ -6,6 +6,8 @@ const http = require('http');
 const path = require('path');
 const prompt = require('prompt');
 
+let rsshuser = /^(?!git@)(?:ssh:\/\/)?([\w-.]+)@/;
+
 let warns = [];
 let errors = [];
 
@@ -22,9 +24,10 @@ let findFileSync = function (filename, start, stop) {
 };
 
 let clone = function (repos, options, callback) {
-    let rUsername = /x{5}/;
     async.eachLimit(repos, 5, function (repo, callback) {
-        repo = repo.replace(rUsername, options.user);
+        repo = repo.replace(rsshuser, function (s, p) {
+            return s.replace(p, options.user);
+        });
         console.log(`Cloning ${repo}`);
         child_process.exec(`git clone ${repo}`, function (err, stdout, stderr) {
             if (err) {
@@ -86,7 +89,7 @@ let pull = function (repos, options) {
         },
         function (callback) {
             let hasPlaceholder = cloneRepos.some(function (u) {
-                return u.indexOf('ssh://xxxxx@') === 0;
+                return rsshuser.test(u);
             });
             if (hasPlaceholder && !options.user) {
                 prompt.message = chalk.green('[?]');

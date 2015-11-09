@@ -26,11 +26,6 @@ program
 });
 
 program
-.command('auth')
-.description('update authentication infomation for interacting with subversion repository')
-.action(run);
-
-program
 .command('lint')
 .description('run linter on files changed')
 .action(run);
@@ -38,7 +33,6 @@ program
 program
 .command('publish')
 .description('publish git changesets to subversion')
-.option('--author <username>', 'specify a author to interacting with subversion repository instead of the default author of commit')
 .option('--preview', 'preview the range of changesets for publish')
 .option('--skip <commit>', 'set the start point of publish after the skip one')
 .action(run);
