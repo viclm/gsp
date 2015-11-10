@@ -1,6 +1,5 @@
 const babel = require('babel-core');
 const babelPreset = require('babel-preset-es2015');
-const path = require('path');
 
 const rjs = /\.js$/;
 const res6comment = /^\/\/es(?:6|2015)\s*?[\r\n]/;
@@ -27,7 +26,7 @@ let compileJS = function (filename, filedata, callback) {
 };
 
 module.exports = function (file, callback) {
-    compileJS(path.join(file.get('workdir'), file.get('filename')), file.get('filedata'), function (err, filedata) {
+    compileJS(file.get('filename'), file.get('filedata'), function (err, filedata) {
         if (!err) {
             file.set('filedata', filedata);
         }
