@@ -1,6 +1,6 @@
 {
   "name": "gsp",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "A repository synchronizer for frontend development workflow",
   "keywords": [
     "git",
@@ -15,6 +15,7 @@
     "name": "viclm",
     "email": "viclm@live.com"
   },
+  "main": "lib/index",
   "bin": {
     "gsp": "bin/gsp"
   },
@@ -27,8 +28,6 @@
   },
   "dependencies": {
     "async": "~1.4.2",
-    "babel-core": "^6.1.2",
-    "babel-preset-es2015": "^6.1.2",
     "chalk": "^1.0.0",
     "chokidar": "^1.0.3",
     "commander": "^2.8.1",
@@ -44,6 +43,8 @@
     "tiny-lr": "^0.1.6"
   },
   "optionalDependencies": {
+    "babel-core": "^6.1.2",
+    "babel-preset-es2015": "^6.1.2",
     "coffee-script": "^1.9.3",
     "csslint": "^0.10.0",
     "eslint": "^0.24.0",

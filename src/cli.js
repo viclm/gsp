@@ -31,20 +31,9 @@ program
 .action(run);
 
 program
-.command('publish')
-.description('publish git changesets to subversion')
-.option('--preview', 'preview the range of changesets for publish')
-.option('--skip <commit>', 'set the start point of publish after the skip one')
-.action(run);
-
-program
-.command('push')
-.description('git push origin master and publish')
-.action(run);
-
-program
-.command('pull')
-.description('clone/update all the git repositories')
+.command('ready')
+.option('--cwd <dir>', 'path to workspace which must contain a gsp_workspace file, default is process.cwd()')
+.description('clone/update all the git repositories and configure workspace')
 .action(run);
 
 program
@@ -57,7 +46,6 @@ program
 .command('start')
 .description('start a local proxy server')
 .option('-d, --daemon', 'run server on daemon mode')
-.option('--cwd <dir>', 'set the working directory, default is process.cwd()')
 .option('-p, --port <port>', 'the port for the server listening')
 .option('--livereload', 'enable LiveReload')
 .action(run);
@@ -69,7 +57,7 @@ program.command('test')
 program
 .command('watch')
 .description('run tasks whenever watched files are added, changed or deleted')
-.option('--cwd <dir>', 'set the working directory, default is process.cwd()')
+.option('--cwd <dir>', 'path to the working directory, default is process.cwd()')
 .option('--livereload', 'enable LiveReload')
 .action(run);
 
