@@ -43,7 +43,7 @@ let start = function (options, watch, file) {
     let server = http.createServer();
     server.on('listening', function (err) {
         if (err) {
-            console.log(chalk.red('Gsp simulator failed to start'));
+            console.error(chalk.red('Gsp simulator failed to start'));
         }
         else {
             console.log('Gsp simulator started, listening on port %s', options.port);
@@ -69,7 +69,7 @@ let start = function (options, watch, file) {
         readfile(pathname, file, function (err, filedata) {
             console.log('GET: ' + pathname);
             if (err) {
-                console.log(chalk.red(err.message));
+                console.error(chalk.bgRed(' ERROR ') + ' ' + err.message);
                 if (filedata) {
                     output(502);
                 }

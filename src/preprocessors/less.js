@@ -14,6 +14,7 @@ let compileLess = function (filedata, callback) {
             let line = err.line - 1;
             let codeLine = filedata.split('\n')[line];
             let offendingCharacter;
+            let errMsg;
 
             if (column < codeLine.length) {
                 offendingCharacter = chalk.red(codeLine[column]);
@@ -23,10 +24,10 @@ let compileLess = function (filedata, callback) {
             }
 
             line += 1;
-            console.log('[less]:' + line + ':' + column + ': e' + err.toString().slice(1));
-            console.log(codeLine.substring(0, column) + offendingCharacter + codeLine.substring(column + 1));
-            console.log(new Array(column + 1).join(' ') + chalk.red('^'));
-            err = new Error('Less errors.');
+            errMsg = '[less]:' + line + ':' + column + ': e' + err.toString().slice(1);
+            errMsg += '\n' + codeLine.substring(0, column) + offendingCharacter + codeLine.substring(column + 1);
+            errMsg += '\n' + new Array(column + 1).join(' ') + chalk.red('^');
+            err = new Error(errMsg);
             callback(err);
         }
         else {

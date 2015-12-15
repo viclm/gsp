@@ -10,8 +10,7 @@ let compileCoffee = function (filedata, callback) {
         });
     }
     catch (e) {
-        console.log(e.toString().replace('[stdin]', '[coffee]'));
-        err = new Error('CoffeeScript errors.');
+        err = new Error(e.toString().replace('[stdin]', '[coffee]'));
     }
     finally {
         callback(err, filedata);

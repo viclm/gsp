@@ -14,9 +14,7 @@ let compileJS = function (filename, filedata, callback) {
             }).code;
         }
         catch (e) {
-            console.log('[es6]' + e.message);
-            console.log(e.codeFrame);
-            err = new Error('ES6 errors.');
+            err = new Error('[es6]' + e.message + '\n' + e.codeFrame);
         }
         callback(err, filedata);
     }
