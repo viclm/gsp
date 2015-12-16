@@ -83,7 +83,7 @@ exports.scaffold = function (options, projectInfo) {
         {
             'name': 'description',
             'message': 'Project description',
-            'default': projectInfo.description || '',
+            'default': projectInfo.description,
             'required': true
         },
         {
@@ -93,8 +93,8 @@ exports.scaffold = function (options, projectInfo) {
         },
         {
             'name': 'mappingDir',
-            'message': 'Mapping directory of production repository for this repository',
-            'default': projectInfo.mappingDir,
+            'message': 'Mapping directory for http request',
+            'default': projectInfo.mappingDir || path.basename(process.cwd()),
             'required': true
         },
         {
@@ -107,6 +107,9 @@ exports.scaffold = function (options, projectInfo) {
     prompt.delimiter = ' ';
     prompt.start();
     prompt.get(schema, function (err, result) {
+        if (err) {
+            process.exit(1);
+        }
         let continuing = result.confirm.toLowerCase() !== 'y';
         delete result.confirm;
         if (continuing) {
@@ -121,7 +124,7 @@ exports.scaffold = function (options, projectInfo) {
             });
         }
         else {
-            exports.init(options, result);
+            exports.scaffold(options, result);
         }
     });
 };

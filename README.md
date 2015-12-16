@@ -64,7 +64,7 @@ Gsp是一个前端自动化构建工具，它包含一系列常用的任务例�
 
 ## 模拟器
 
-Gsp仓库中的代码不能直接在浏览器中运行，需要使用 [Gsp-deploy](https://www.npmjs.com/package/gsp-deploy) 编译部署。在开发阶段，Gsp提供了一个本地模拟器，它根据HTTP请求即时编译文件，达到本地调试效果。
+Gsp仓库中的代码不能直接在浏览器中运行，需要使用 [Gsp-deploy](https://www.npmjs.com/package/gsp-deploy) 编译部署。在开发阶段，Gsp提供了一个模拟器，它根据HTTP请求即时编译文件，便于本地调试。
 
 运行`gsp start`，默认开启**7070**端口。
 

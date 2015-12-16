@@ -66,5 +66,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-nodemon');
 
+  grunt.registerTask('build', ['copy', 'babel']);
   grunt.registerTask('default', ['eslint', 'copy', 'babel']);
 };

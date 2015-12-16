@@ -4,4 +4,3 @@ node_modules/
 workspance_default_root
 .grunt
 Thumbs.db
-.gsproxy/
