@@ -18,7 +18,7 @@ program
         }
     });
     if (cmd) {
-        console.log("'\s' is not a gsp command. See 'gsp --help'.", cmd);
+        console.log("'\s' is not a gsp command, see 'gsp --help'", cmd);
     }
     else {
         program.help();
@@ -32,7 +32,7 @@ program
 
 program
 .command('ready')
-.option('--cwd <dir>', 'path to workspace which must contain a gsp_workspace file, default is process.cwd()')
+.option('--cwd [dir]', 'path to a valid gsp workspace', process.cwd())
 .description('clone/update all the git repositories and configure workspace')
 .action(run);
 
@@ -57,7 +57,7 @@ program.command('test')
 program
 .command('watch')
 .description('run tasks whenever watched files are added, changed or deleted')
-.option('--cwd <dir>', 'path to the working directory, default is process.cwd()')
+.option('--cwd [dir]', 'path to a valid gsp workspace', process.cwd())
 .option('--livereload', 'enable LiveReload')
 .action(run);
 

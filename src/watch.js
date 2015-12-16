@@ -194,7 +194,6 @@ let watch = function (options, gspdata, lint, livereload) {
 };
 
 exports.watch = function (options) {
-    options.cwd = options.cwd || process.cwd();
     let module = {
         options: ['value', options],
         gspdata: ['value', gspdata],

@@ -19,8 +19,7 @@ let findFileSync = function (filename, start, stop) {
 };
 
 let ready = function (options, callback) {
-    let cwd = options.cwd || process.cwd();
-    let workspace = findFileSync('.gsp_workspace', cwd);
+    let workspace = findFileSync('.gspworkspace', options.cwd);
     if (workspace) {
         let repos = fs.readFileSync(workspace, {encoding: 'utf8'}).match(/\S+/g);
         let rMaster = /^\*\smaster\b/m;
@@ -90,19 +89,19 @@ let ready = function (options, callback) {
                 callback();
             }
             else {
-                console.log('\nSome repositories are failed to update.');
-                errors = errors.map(function (error) {
-                    console.log(`\n${chalk.bold.white.bgRed(' ERROR ')} ${error.repo}`);
-                    console.log(error.msg);
-                    return error.repo + ': ' + error.msg;
-                });
-                callback(new Error(errors.join('\n')));
+                console.log(chalk.bold.red('\nSome repositories are failed to update.\n'));
+                callback(new Error(errors.map(function (e) {
+                    return `Failed to update ${e.repo}\n${e.msg}`;
+                }).join('\n\n')));
             }
         });
     }
     else {
-        console.log(chalk.red('Can Not find a .gsp_workspace file.'));
-        callback(new Error('Can Not find a .gsp_workspace file.'));
+        let error = new Error(`${options.cwd} is not a valid gsp workspace.`);
+        error.toString = function () {
+            return chalk.red(this.message);
+        };
+        callback(error);
     }
 };
 
@@ -110,7 +109,11 @@ let ready = function (options, callback) {
 exports.ready = function (options, callback) {
     let injector = new di.Injector([{
         options: ['value', options],
-        callback: ['value', callback || function () {}]
+        callback: ['value', callback || function (err) {
+            if (err) {
+                console.error(err.toString());
+            }
+        }]
     }]);
     injector.invoke(ready);
 };

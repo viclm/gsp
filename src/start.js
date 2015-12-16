@@ -69,7 +69,7 @@ let start = function (options, watch, file) {
         readfile(pathname, file, function (err, filedata) {
             console.log('GET: ' + pathname);
             if (err) {
-                console.error(chalk.bgRed(' ERROR ') + ' ' + err.message);
+                console.error(chalk.bold.white.bgRed(' ERROR ') + ' ' + err.message);
                 if (filedata) {
                     output(502);
                 }
