@@ -90,9 +90,13 @@ let ready = function (options, callback) {
             }
             else {
                 console.log(chalk.bold.red('\nSome repositories are failed to update.\n'));
-                callback(new Error(errors.map(function (e) {
+                let error = new Error(errors.map(function (e) {
                     return `Failed to update ${e.repo}\n${e.msg}`;
-                }).join('\n\n')));
+                }).join('\n\n'));
+                error.toString = function () {
+                    return this.message;
+                }
+                callback(error);
             }
         });
     }

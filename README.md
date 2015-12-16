@@ -2,61 +2,34 @@
 [![Build Status](https://secure.travis-ci.org/viclm/gsp.png?branch=master)](http://travis-ci.org/viclm/gsp)
 [![Dependecies Status](https://david-dm.org/viclm/gsp.png)](https://david-dm.org/viclm/gsp)
 
-## Intro
+## 介绍
 
-Gsp encourages to use multiple git repositories for development and one subversion repository for production to make code clean, it will be in charge of the synchronous work.
-Use multiple repositories is very suitable for frontend development, it encourages a independent workflow and can be easly integrated with other tools like JIRA and Phabraicator.
-Especially, gsp allow static resource files(like javascript and css) combining across repositories which has great significance to the performance of webpage.
+Gsp是一个前端自动化构建工具，它包含一系列常用的任务例如编译、单元测试和Linting，同时可以很方便的添加自定义任务。
 
-Gsp uses git hooks(pre-commit) to integrate lint and unit tests, besides it support coffee and less autocompiling.
+目前包含的任务
 
-## Installation
+- CoffeeScript／ES2015／Less自动编译
+- 文件合并
+- 模块化
+- 单元测试
+- Lint
+- 工程脚手架
+- 自动刷新浏览器
+- 自动监测文件修改
 
-Install the application with: `npm install -g gsp`.
+## 安装
 
-## The simulator
+使用NPM安装： `npm install -g gsp`
 
-Gsp has simulator running for generating temple files based on resource requst, in additon, it can accomplish some tasks like lint and unit tests before commiting changes.
+## 工作区配置
 
-1. Run `gsp pull` in a new directory(path/to/workspace, for example) to clone all the development repositories.
-2. Run `gsp start` on directory above to start a simulator for resource requst
-3. Config a webserver(nginx/apache/lighttpd) and start
+新建一个包含名为 **.gspworkspace** 文件的目录，文件内容为代码仓库的远程地址，每个仓库独占一行。
 
-## Config nginx
+运行`gsp ready`克隆所有仓库并更新工作区配置，以后随时可以使用这个命令一键更新仓库。`gsp ready`命令会根据 **.gspworkspace** 文件指定的仓库地址智能克隆/更新仓库，并更新Gsp工作区配置。
 
-```text
-server {
-  listen       80;
-  server_name  static.resource.com;
-  charset utf-8;
+## 仓库配置
 
-  location ~* \.(?:ttf|eot|woff)$ {
-      add_header "Access-Control-Allow-Origin" "*";
-      expires 1M;
-      access_log off;
-      add_header Cache-Control "public";
-      proxy_set_header x-request-filename $request_filename;
-      proxy_pass http://127.0.0.1:7070;
-  }
-
-  location ~* /.+\.[a-z]+$ {
-      proxy_pass http://127.0.0.1:7070;
-  }
-}
-```
-
-## Configs for communication
-
-Gsp use a special domain "gsp.com" for interacting with server, this domain must link to the machine where the gsp server runs.
-You can bind it in your DNS provider, or just edit the hosts file.
-
-```text
-192.168.1.110 gsp.com
-```
-
-## Repository configuration
-
-Every development repository should contain a `.gspconfig` file.
+每个仓库（以下简称Gsp仓库）需要包含一个 **.gspconfig** 文件。
 
 ```
 {
@@ -78,9 +51,6 @@ Every development repository should contain a `.gspconfig` file.
     "spec_files": "test/spec/**/*.js",
     "helper_files": "test/helper/**/*.js"
   },
-  "compress": {
-      "png": true
-  },
   "modular": {
     "type": "amd",
     "idprefix": "home",
@@ -89,28 +59,53 @@ Every development repository should contain a `.gspconfig` file.
   "preprocessors": {
       "coffee": ["coffee", "modular"],
       "less": ["less"],
-      "js": ["modular"]
+      "js": ["es6", "modular"]
   }
 }
 ```
 
-## Commands
-1. gsp auth                 update authentication infomation for interacting with subversion repository
-2. gsp lint                 run linter on files changed
-3. gsp publish [options]    publish git changesets to subversion
-4. gsp push                 git push origin master and publish
-5. gsp pull                 clone/update all the git repositories
-6. gsp scaffold [options]   generate project scaffolding
-7. gsp start [options]      start a local proxy server
-8. gsp test                 run test specs against chaned files
-9. gsp watch [options]      run tasks whenever watched files are added, changed or deleted
+## 模拟器
 
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
+Gsp仓库中的代码不能直接在浏览器中运行，需要使用 [Gsp-deploy](https://www.npmjs.com/package/gsp-deploy) 编译部署。在开发阶段，Gsp提供了一个本地模拟器，它根据HTTP请求即时编译文件，达到本地调试效果。
 
-## Release History
+运行`gsp start`，默认开启**7070**端口。
+
+需要配置Web服务器转发文件请求（以Nginx为例，其他可自行参照配置）。
+
+## 配置Nginx
+
+```text
+server {
+  listen       80;
+  server_name  static.resource.com;
+  charset utf-8;
+
+  rewrite (.*)_[0-9a-z]+(\.[a-z]+)$ $1$2;
+
+  location ~* \.(?:ttf|eot|woff)$ {
+      add_header "Access-Control-Allow-Origin" "*";
+      expires 1M;
+      access_log off;
+      add_header Cache-Control "public";
+      proxy_pass http://127.0.0.1:7070;
+  }
+
+  location ~* /.+\.[a-z]+$ {
+      proxy_pass http://127.0.0.1:7070;
+  }
+}
+```
+
+## 帮助
+
+运行`gsp help`查看完整的命令列表，运行`gsp help <command>`查看某个命令的详细信息。
+
+## 贡献
+Gsp使用ES2015，可运行`grunt watch`实时编译源码。
+
+## 发布历史
 _(Nothing yet)_
 
 ## License
-Copyright (c) 2014 viclm
+Copyright (c) 2015 viclm
 Licensed under the MIT license.
