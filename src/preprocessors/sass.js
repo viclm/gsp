@@ -1,16 +1,17 @@
 const chalk = require('chalk');
-const less = require('less');
+const sass = require('node-sass');
 
-let rLess = /\.less$/;
+let rsass = /\.sass$/;
+let rimport = /^@import\s/m;
 
-let compileLess = function (filedata, callback) {
-    if (/^@import\s/m.test(filedata)) {
-        callback(new Error('less import directives are not supported'));
+let compilesass = function (filedata, callback) {
+    if (rimport.test(filedata)) {
+        callback(new Error('sass import directives are not supported'));
         return;
     }
-    less.render(filedata, function (err, data) {
+    sass.render({data: filedata}, function (err, data) {
         if (err) {
-            let column = err.column + 1;
+            let column = err.column;
             let line = err.line - 1;
             let codeLine = filedata.split('\n')[line];
             let offendingCharacter;
@@ -24,7 +25,7 @@ let compileLess = function (filedata, callback) {
             }
 
             line += 1;
-            errMsg = '[less]:' + line + ':' + column + ': ' + err.message;
+            errMsg = '[sass]:' + line + ':' + column + ': ' + err.message;
             errMsg += '\n' + codeLine.substring(0, column - 1) + offendingCharacter + codeLine.substring(column);
             errMsg += '\n' + new Array(column).join(' ') + chalk.red('^');
             err = new Error(errMsg);
@@ -37,9 +38,9 @@ let compileLess = function (filedata, callback) {
 };
 
 module.exports = function (file, callback) {
-    compileLess(file.get('filedata'), function (err, filedata) {
+    compilesass(file.get('filedata'), function (err, filedata) {
         if (!err) {
-            file.set('filename', file.get('filename').replace(rLess, '.css'));
+            file.set('filename', file.get('filename').replace(rsass, '.css'));
             file.set('filedata', filedata);
         }
         callback(err);

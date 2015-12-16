@@ -2,13 +2,11 @@
 [![Build Status](https://secure.travis-ci.org/viclm/gsp.png?branch=master)](http://travis-ci.org/viclm/gsp)
 [![Dependecies Status](https://david-dm.org/viclm/gsp.png)](https://david-dm.org/viclm/gsp)
 
-## 介绍
-
 Gsp是一个前端自动化构建工具，它包含一系列常用的任务例如编译、单元测试和Linting，同时可以很方便的添加自定义任务。
 
 目前包含的任务
 
-- CoffeeScript／ES2015／Less自动编译
+- CoffeeScript／ES2015／Less／Sass自动编译
 - 文件合并
 - 模块化
 - 单元测试

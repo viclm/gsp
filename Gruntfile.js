@@ -41,6 +41,17 @@ module.exports = function (grunt) {
           spawn: false
         },
       },
+    },
+
+    nodemon: {
+      dev: {
+        script: 'bin/gsp',
+        options: {
+          args: ['start'],
+          watch: ['lib'],
+          delay: 2000
+        }
+      }
     }
 
   });
@@ -53,7 +64,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-nodemon');
 
-  grunt.registerTask('build', ['copy', 'babel']);
   grunt.registerTask('default', ['eslint', 'copy', 'babel']);
 };

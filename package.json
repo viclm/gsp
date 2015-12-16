@@ -1,7 +1,7 @@
 {
   "name": "gsp",
-  "version": "0.4.2",
-  "description": "A repository synchronizer for frontend development workflow",
+  "version": "0.5.0",
+  "description": "Automatic builder for frontend developers.",
   "keywords": [
     "git",
     "svn",
@@ -51,6 +51,7 @@
     "jasmine-core": "^2.3.4",
     "jsonlint": "^1.6.2",
     "less": "^2.5.1",
+    "node-sass": "^3.4.2",
     "phantomjs": "^1.9.17"
   },
   "devDependencies": {
@@ -58,7 +59,8 @@
     "grunt-babel": "^5.0.1",
     "grunt-contrib-copy": "^0.8.0",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-eslint": "^17.0.0"
+    "grunt-eslint": "^17.0.0",
+    "grunt-nodemon": "^0.4.1"
   },
   "engines": {
     "node": ">= 0.12.0"
