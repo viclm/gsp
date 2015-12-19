@@ -1,35 +1,64 @@
-const glob = require('../util/glob');
 const path = require('path');
 
-let rRequire = /^(?:var\s+?([\w$]+)\s*?=\s*?)?require\s*?\(\s*?(['"])(.+)\2\s*?\)\s*?;?\s*?$[\n\r]*/mg;
-let rModuleWrapper = /^(define|require)\s*?\(/m;
+const rrequire = /require\(\s*?(['"])(.+?)\1\s*?\)/g;
+const rexportsmodule = /\b(exports|module)\b/g;
+const rdefine = /^(define\(\s*)((?:\[.+\]\s*,\s*)?function\b)/m;
+const rdefineWithId = /^define\(\s*(['"]).+?\1\s*,\s*(?:\[.+\]\s*,\s*)?function\b/m;
+const rclosurewrapper = /^\(\s*function\b/;
 
-let wrapModular = function (repoLocation, repoConfig, filePath, fileContent) {
-    let moduleExports = [], moduleIds = [], moduleId;
-    if (!repoConfig.modular || repoConfig.modular.ignore && glob.match(filePath, repoConfig.modular.ignore)) {
+const defaultConfig = {
+    type: 'amd',
+    idprefix: '',
+    loadfunction: 'require',
+    trimleading: 'src|dist'
+};
+
+let wrapModular = function (filePath, fileContent, repoConfig) {
+    let moduleConfig = Object.assign(defaultConfig, repoConfig.modular);
+    if (rclosurewrapper.test(fileContent) || rdefineWithId.test(fileContent) || new RegExp(`^${moduleConfig.loadfunction}\\(`, 'm').test(fileContent)) {
         return fileContent;
     }
-
-    fileContent = fileContent.replace(rRequire, function (line, me, qoute, mi) {
-        moduleExports.push(me || '__' + path.basename(mi) + '__');
-        moduleIds.push(mi);
-        return '';
+    let moduleId = filePath.slice(0, -path.extname(filePath).length).replace(/^[^\/]+\//, '');
+    if (moduleConfig.idprefix) {
+        moduleId = moduleConfig.idprefix + '/' + moduleId;
+    }
+    let parseDependencies = true;
+    fileContent = fileContent.replace(rdefine, function (str, p1, p2) {
+        parseDependencies = false;
+        return p1 + moduleId + ', ' + p2;
     });
-
-    if (!rModuleWrapper.test(fileContent)) {
-        moduleIds.push('require', 'exports', 'module');
-        moduleExports.push('require', 'exports', 'module');
-        moduleId = filePath.slice(0, -path.extname(filePath).length).replace(/^[^\/]+\//, '');
-        if (repoConfig.modular.idprefix) {
-            moduleId = repoConfig.modular.idprefix + '/' + moduleId;
+    if (parseDependencies) {
+        let moduleIds = [], moduleExports = [];
+        let require;
+        while (require = rrequire.exec(fileContent)) {//eslint-disable-line
+            moduleIds.push(require[2]);
         }
-        fileContent = "define('"+moduleId+"', ['"+moduleIds.join("','")+"'], function ("+moduleExports.join(",")+") {\n"+fileContent+"});";
+        if (moduleIds.length > 0) {
+            if (moduleConfig.type === 'amd') {
+                moduleIds.push('require');
+            }
+            moduleExports.push('require');
+        }
+        let exportsmodule = fileContent.match(rexportsmodule);
+        if (exportsmodule) {
+            exportsmodule = Array.from(new Set(exportsmodule)).sort();
+            if (moduleConfig.type === 'amd') {
+                moduleIds.push(...exportsmodule);
+            }
+            moduleExports.push(...exportsmodule);
+        }
+        if (moduleIds.length > 0) {
+            fileContent = `define('${moduleId}', ['${moduleIds.join("','")}'], function(${moduleExports.join(",")}) {\n${fileContent}\n});`;
+        }
+        else {
+            fileContent = `define('${moduleId}', function() {\n${fileContent}\n});`;
+        }
     }
     return fileContent;
 };
 
 module.exports = function (file, callback) {
-    let filedata = wrapModular(file.get('workdir'), file.get('config'), file.get('filename'), file.get('filedata'));
+    let filedata = wrapModular(file.get('filename'), file.get('filedata'), file.get('config'));
     file.set('filedata', filedata);
     callback();
 };

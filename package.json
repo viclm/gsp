@@ -1,6 +1,6 @@
 {
   "name": "gsp",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Automatic builder for frontend developers.",
   "keywords": [
     "git",
@@ -63,7 +63,7 @@
     "grunt-nodemon": "^0.4.1"
   },
   "engines": {
-    "node": ">= 0.12.0"
+    "node": ">= 4.0.0"
   },
   "preferGlobal": true
 }
