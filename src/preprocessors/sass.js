@@ -1,15 +1,13 @@
 const chalk = require('chalk');
 const sass = require('node-sass');
+const path = require('path');
 
-let rsass = /\.sass$/;
-let rimport = /^@import\s/m;
+let rsass = /\.(?:sass|scss)$/;
 
-let compilesass = function (filedata, callback) {
-    if (rimport.test(filedata)) {
-        callback(new Error('sass import directives are not supported'));
-        return;
-    }
-    sass.render({data: filedata}, function (err, data) {
+let compilesass = function (workdir, filename, filedata, callback) {
+    sass.render({
+        file: path.join(workdir, filename)
+    }, function (err, data) {
         if (err) {
             let column = err.column;
             let line = err.line - 1;
@@ -38,7 +36,7 @@ let compilesass = function (filedata, callback) {
 };
 
 module.exports = function (file, callback) {
-    compilesass(file.get('filedata'), function (err, filedata) {
+    compilesass(file.get('workdir'), file.get('filename'), file.get('filedata'), function (err, filedata) {
         if (!err) {
             file.set('filename', file.get('filename').replace(rsass, '.css'));
             file.set('filedata', filedata);

@@ -52,7 +52,8 @@ Gsp是一个前端自动化构建工具，它包含一系列常用的任务例�
   "modular": {
     "type": "amd",
     "idprefix": "home",
-    "ignore": "+(lib|src|test)/**"
+    "loadfunction": "require",
+    "trimleading": "src|dist"
   },
   "preprocessors": {
       "coffee": ["coffee", "modular"],

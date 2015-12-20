@@ -1,14 +1,14 @@
 const chalk = require('chalk');
 const less = require('less');
+const path = require('path');
 
 let rLess = /\.less$/;
 
-let compileLess = function (filedata, callback) {
-    if (/^@import\s/m.test(filedata)) {
-        callback(new Error('less import directives are not supported'));
-        return;
-    }
-    less.render(filedata, function (err, data) {
+let compileLess = function (workdir, filename, filedata, callback) {
+    less.render(filedata, {
+            paths: [path.dirname(path.join(workdir, filename))]
+        },
+        function (err, data) {
         if (err) {
             let column = err.column + 1;
             let line = err.line - 1;
@@ -37,7 +37,7 @@ let compileLess = function (filedata, callback) {
 };
 
 module.exports = function (file, callback) {
-    compileLess(file.get('filedata'), function (err, filedata) {
+    compileLess(file.get('workdir'), file.get('filename'), file.get('filedata'), function (err, filedata) {
         if (!err) {
             file.set('filename', file.get('filename').replace(rLess, '.css'));
             file.set('filedata', filedata);
