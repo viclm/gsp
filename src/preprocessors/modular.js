@@ -4,7 +4,7 @@ const rrequire = /require\(\s*?(['"])(.+?)\1\s*?\)/g;
 const rexportsmodule = /\b(exports|module)\b/g;
 const rdefine = /^(define\(\s*)((?:\[.+\]\s*,\s*)?function\b)/m;
 const rdefineWithId = /^define\(\s*(['"]).+?\1\s*,\s*(?:\[.+\]\s*,\s*)?function\b/m;
-const rclosurewrapper = /^\(\s*function\b/;
+const rclosurewrapper = /^\(\s*function\b/m;
 
 const defaultConfig = {
     type: 'amd',
@@ -18,7 +18,7 @@ let wrapModular = function (filePath, fileContent, repoConfig) {
     if (rclosurewrapper.test(fileContent) || rdefineWithId.test(fileContent) || new RegExp(`^${moduleConfig.loadfunction}\\(`, 'm').test(fileContent)) {
         return fileContent;
     }
-    let moduleId = filePath.slice(0, -path.extname(filePath).length).replace(/^[^\/]+\//, '');
+    let moduleId = filePath.slice(0, -path.extname(filePath).length).replace(new RegExp('^(?:' + moduleConfig.trimleading + ')/'), '');
     if (moduleConfig.idprefix) {
         moduleId = moduleConfig.idprefix + '/' + moduleId;
     }
