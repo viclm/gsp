@@ -34,7 +34,9 @@ class File {
         let filename = path.join(this.workdir, this.filename);
         if (fs.existsSync(filename)) {
             let mtime = fs.statSync(filename).mtime.getTime();
-            if ($fileCache[filename]) {
+            let whiteExts = ['.sass','.scss','.less','.styl'];
+            let ext = path.extname(filename);
+            if ($fileCache[filename] && whiteExts.indexOf(ext) === -1) {
                 if ($fileCache[filename].mtime === mtime) {
                     callback(null, $fileCache[filename].content);
                     return;
